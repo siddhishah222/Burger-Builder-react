@@ -1,37 +1,28 @@
-export { 
-          addIngredient,
-          removeIngredient,
-          initIngredients,
-          //sagas
-          setIngredients,
-          fetchIngredientFailed
-
-       } from './burgerBuilder';
-       
-export {
-          purchaseBurger,
-          purchasedInit,
-          fetchOrders,
-          purchaseBurgerSuccess,
-          purchaseBurgerFail,
-          purchaseBurgerStart,
-          fetchOrdersSuccess,
-          fetchOrdersFail,
-          fetchOrdersStart
-      } from './order';
-
-export {
-    auth,
-    logout,  //to import inauth/sagas & use with PUT function to dispatch
-    setAuthRedirectPath,
-    authCheckState,
-    //export for SAGAS start below
-    logoutSucceed,
-    authStart,
-    authSuccess,
-    checkAuthTimeout,
-    authFail
-} from './auth';
+import {logoutSaga,checkAuthTimeoutSaga,authUserSaga, authCheckStateSaga} from './auth';
+import {takeEvery, all, takeLatest} from 'redux-saga/effects';
+import * as actionTypes from '../actions/actionType';
+import { initIngredientsSaga } from './burgerBuilder';
+import {purchaseBurgerSaga,fetchOrdersSaga} from './order';
 
 
-//only export async actionCreators
+export function* watchAuth(){
+    yield all([
+         takeEvery(actionTypes.AUTH_INITIATE_LOGOUT,logoutSaga),
+         takeEvery(actionTypes.AUTH_CHECK_TIMEOUT,checkAuthTimeoutSaga),
+         takeEvery(actionTypes.AUTH_USER_SAGA,authUserSaga),
+         takeEvery(actionTypes.AUTH_CHECK_STATE,authCheckStateSaga),
+         takeEvery(actionTypes.FETCH_ORDERS,fetchOrdersSaga),
+    ])
+    
+}
+
+export function* watchBurgerBuilder(){
+    yield takeEvery(actionTypes.INIT_INGREDIENTS,initIngredientsSaga);
+}
+
+export function* watchOrder(){
+    yield takeLatest(actionTypes.PURCHASE_BURGER ,purchaseBurgerSaga);
+    yield takeEvery(actionTypes.FETCH_ORDERS,fetchOrdersSaga);
+}
+//yield says execute this function and wait fro it to finish 
+//to takeEvery( Pass the action we want to listen to)

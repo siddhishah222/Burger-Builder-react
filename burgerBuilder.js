@@ -1,46 +1,14 @@
-import * as actionTypes from './actionType';
+//import * as actionTypes from '../actions/actionType';
+import * as actions from '../actions/index';
+import axios from '../../axios-orders';
+import { put } from 'redux-saga/effects';
 
-
-export const addIngredient=(name)=>{
-    return{
-        type:actionTypes.ADD_INGREDIENT,
-        ingredientName: name
-    };
+export function* initIngredientsSaga(action){  
+       try{
+           const response=yield axios.get('https://react-burger-builder-10b6a.firebaseio.com/ingredients.json')
+        // .then(response=>{
+           yield put(actions.setIngredients(response.data));
+         }catch(error){
+            yield put(actions.fetchIngredientFailed());
+         }           
 };
-
-export const removeIngredient=(name)=>{
-    return{
-        type:actionTypes.REMOVE_INGREDIENT,
-        ingredientName: name
-    };
-};
-
-export const setIngredients=(ingredients)=>{
-    return {
-        type:actionTypes.SET_INGREDIENTS,
-        fetching:ingredients
-    };
-};
-
-export const fetchIngredientFailed=()=>{
-   return {
-       type:actionTypes.FETCH_INGREDIENTS_FAILED
-   }
-};
-
-export const initIngredients=()=>{
-    return{
-        type:actionTypes.INIT_INGREDIENTS
-    }
-    // return dispatch=>{     //this synatx due to redux-thunk
-    //     axios.get('https://react-burger-builder-10b6a.firebaseio.com/ingredients.json')
-    //     .then(response=>{
-    //        dispatch(setIngredients(response.data));
-    //     })
-    //     .catch(error=>{
-    //         dispatch(fetchIngredientFailed());
-    //     })
-    // };
-};
-
-//ACTION CREATOR FILE

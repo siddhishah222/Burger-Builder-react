@@ -1,108 +1,36 @@
-import * as actionTypes from './actionType';
+import {put} from 'redux-saga/effects';
+import * as actions from '../actions/index';
+import axios from '../../axios-orders';
 
-export const purchaseBurgerSuccess=(id, orderData)=>{
-    return{
-      type: actionTypes.PURCHASE_BURGER_SUCCESS,
-      orderId:id,
-      orderData: orderData
-    }
-}   //sync actioncreators
 
-export const purchaseBurgerFail=(error)=>{
-    return{
-      type: actionTypes.PURCHASE_BURGER_FAIL,
-      error: error
-    }
-}  //sync actioncreators
-
-export const purchaseBurgerStart =()=>{
-  return{
-      type:actionTypes.PURCHASE_BURGER_START
-  };
+export function* purchaseBurgerSaga(action){
+ 
+    yield put(actions.purchaseBurgerStart());
+    try{
+        const response= yield axios.post('/orders.json?auth='+action.token,action.orderData)
+            yield put(actions.purchaseBurgerSuccess(response.data.name, action.orderData));
+   }catch(error){
+            yield put(actions.purchaseBurgerFail(error));
+            }
 };
 
-export const purchaseBurger= (orderData,token)=>{
-    return{
-        type:actionTypes.PURCHASE_BURGER,
-        orderData:orderData,
-        token:token
-    }
-    // return dispatch=>{
-    //     dispatch(purchaseBurgerStart());
-    //     axios.post('/orders.json?auth='+token,orderData)
-    //     .then(response=>{
-           
-    //         dispatch(purchaseBurgerSuccess(response.data.name, orderData));
-
-    //         // this.setState({loading:false});
-    //         //console.log(response)
-    //         // this.props.history.push('/');
-    //     })
-    //     .catch(error=>{
-    //         dispatch(purchaseBurgerFail(error));
-    //         // this.setState({loading:false});
-    //         //console.log('error');
-    //     });
-    // };
-};
-
-export const purchasedInit=()=>{
-    return{
-        type:actionTypes.PURCHASE_INIT
-    };
-};
-
-
-
-export const fetchOrdersSuccess=(orders)=>{
-    return{
-      type: actionTypes.FETCH_ORDERS_SUCCESS,
-      orders:orders,
-    }
-}   //sync actioncreators
-
-export const fetchOrdersFail=(error)=>{
-    return{
-      type: actionTypes.FETCH_ORDERS_FAIL,
-      error: error
-    }
-}  //sync actioncreators
-
-
-export const fetchOrdersStart= ()=>{
-    return{
-        type:actionTypes.FETCH_ORDERS_START
-    };
-};
-
-export const fetchOrders=(token,userId)=>{
-   return{ type:actionTypes.FETCH_ORDERS,
-    token:token,
-    userId:userId
-   }
-    // return dispatch=>{
-    //     dispatch (fetchOrdersStart());   //to show spinner when we load a page
-    //     const queryParams='?auth='+ token+'&orderBy="userId"&equalTo="'+ userId +'"';
-    //     //axios.get('/orders.json?auth='+ token)  //pass ? queryparams and auth= + token for authenticated users to have access to orders.
-    //     axios.get('/orders.json'+ queryParams) 
-    //     .then(res=>{
-    //         const fetchedOrders=[];
-    //        for (let key in res.data){
-    //            fetchedOrders.push({
-    //                ...res.data[key],
-    //                id:key
-    //             });   //converting Orders from object to array
-    //        }
-    //        dispatch(fetchOrdersSuccess(fetchedOrders));
-    //       // this.setState({loading:false, orders:fetchedOrders});
-    //     })
-    //     .catch(err=>{
-    //         dispatch(fetchOrdersFail(err))
-    //        //this.setState({loading:false});
-    //     })
-        
-    // };
+export function* fetchOrdersSaga(action){
+        yield put(actions.fetchOrdersStart());   //to show spinner when we load a page
+        const queryParams='?auth='+ action.token+'&orderBy="userId"&equalTo="'+ action.userId +'"';
+        //axios.get('/orders.json?auth='+ token)  //pass ? queryparams and auth= + token for authenticated users to have access to orders.
+        try{
+        const response= yield axios.get('/orders.json'+ queryParams)  
+          const fetchedOrders=[];
+           for (let key in response.data){
+               fetchedOrders.push({
+                   ...response.data[key],
+                   id:key
+                });   //converting Orders from object to array
+           }
+           yield put(actions.fetchOrdersSuccess(fetchedOrders));
+          // this.setState({loading:false, orders:fetchedOrders});
+    }catch(error){
+            yield put(actions.fetchOrdersFail(error))
+           //this.setState({loading:false});
+        }
 }
-
-
-
