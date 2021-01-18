@@ -1,114 +1,108 @@
-import * as actionTypes from '../actions/actionType';
-import { updateObject } from '../../shared/utility';
+import * as actionTypes from './actionType';
 
-const initialState={
-    orders:[],
-    loading: false,
-    purchased:false
-}   //JS object
-
-const purchaseInit=(state,action)=>{
-    return updateObject(state, {purchased:false});
-}
-
-const purchaseBurgerStart=(state,action)=>{
-    return updateObject(state, {loading:true});
-}
-
-const purchaseBurgerSuccess=(state,action)=>{
-    const newOrder= updateObject(action.orderData, {id:action.orderId});
-    return updateObject(state, {loading:false,purchased:true,order:state.orders.concat(newOrder)});
-}
-
-const purchaseBurgerFail=(state,action)=>{
-    return updateObject(state,{loading:false} );
-}
-
-const fetchOrdersStart=(state,action)=>{
-    return updateObject(state,{ loading:true} );
-}
-
-const fetchOrdersSuccess=(state,action)=>{
-    return updateObject(state,{ orders:action.orders,loading:false} );
-}
-
-const fetchOrdersFail=(state,action)=>{
-    return updateObject(state,{ loading:false} );
-}
-
-
-
-const reducer=(state=initialState, action)=>{
-   switch (action.type){
-       case actionTypes.PURCHASE_INIT: return purchaseInit(state,action);
-        //    return updateObject(state,{purchased:false});
-
-        //    return{
-        //      ...state,
-        //      purchased:false
-        //    }
-       case actionTypes.PURCHASE_BURGER_START: return purchaseBurgerStart(state,action);
-           //return updateObject(state, {loading:true});
-
-        //    return{
-        //        ...state,
-        //        loading:true
-        //    };
-
-       case actionTypes.PURCHASE_BURGER_SUCCESS: return purchaseBurgerSuccess(state,action);
-           
-           //const newOrder= updateObject(action.orderData, {id:action.orderId});
-        
-        //     const newOrder=
-        //        ...action.orderData,
-        //        id:action.orderId
-        //    };
-
-          // return updateObject(state, {loading:false,purchased:true,order:state.orders.concat(newOrder)})
-        
-        //    return{
-        //      ...state,
-        //      loading:false,
-        //      purchased:true,
-        //      order:state.orders.concat(newOrder)
-             
-        //    };
-
-        case actionTypes.PURCHASE_BURGER_FAIL:return purchaseBurgerFail(state,action);
-            // return updateObject(state,{ loading:false} );
-
-        //    return{
-        //         ...state,
-        //         loading:false
-        //     };
-        
-        case actionTypes.FETCH_ORDERS_START: return fetchOrdersStart(state,action);
-            // return updateObject(state,{ loading:true} );
-
-            // return{
-            //     ...state,
-            //     loading:true
-            // };
-        
-        case actionTypes.FETCH_ORDERS_SUCCESS: return fetchOrdersSuccess(state,action);
-            // return updateObject(state,{ orders:action.orders,loading:false} );
-
-            // return{
-            //     ...state,
-            //     orders:action.orders,
-            //     loading:false
-            // }
-        
-        case actionTypes.FETCH_ORDERS_FAIL: return fetchOrdersFail(state,action);
-            // return updateObject(state,{ loading:false} );
-
-            // return{
-            //         ...state,
-            //         loading:false
-            // };
-
-        default: return state;
+export const purchaseBurgerSuccess=(id, orderData)=>{
+    return{
+      type: actionTypes.PURCHASE_BURGER_SUCCESS,
+      orderId:id,
+      orderData: orderData
     }
+}   //sync actioncreators
+
+export const purchaseBurgerFail=(error)=>{
+    return{
+      type: actionTypes.PURCHASE_BURGER_FAIL,
+      error: error
+    }
+}  //sync actioncreators
+
+export const purchaseBurgerStart =()=>{
+  return{
+      type:actionTypes.PURCHASE_BURGER_START
+  };
 };
 
-export default reducer;
+export const purchaseBurger= (orderData,token)=>{
+    return{
+        type:actionTypes.PURCHASE_BURGER,
+        orderData:orderData,
+        token:token
+    }
+    // return dispatch=>{
+    //     dispatch(purchaseBurgerStart());
+    //     axios.post('/orders.json?auth='+token,orderData)
+    //     .then(response=>{
+           
+    //         dispatch(purchaseBurgerSuccess(response.data.name, orderData));
+
+    //         // this.setState({loading:false});
+    //         //console.log(response)
+    //         // this.props.history.push('/');
+    //     })
+    //     .catch(error=>{
+    //         dispatch(purchaseBurgerFail(error));
+    //         // this.setState({loading:false});
+    //         //console.log('error');
+    //     });
+    // };
+};
+
+export const purchasedInit=()=>{
+    return{
+        type:actionTypes.PURCHASE_INIT
+    };
+};
+
+
+
+export const fetchOrdersSuccess=(orders)=>{
+    return{
+      type: actionTypes.FETCH_ORDERS_SUCCESS,
+      orders:orders,
+    }
+}   //sync actioncreators
+
+export const fetchOrdersFail=(error)=>{
+    return{
+      type: actionTypes.FETCH_ORDERS_FAIL,
+      error: error
+    }
+}  //sync actioncreators
+
+
+export const fetchOrdersStart= ()=>{
+    return{
+        type:actionTypes.FETCH_ORDERS_START
+    };
+};
+
+export const fetchOrders=(token,userId)=>{
+   return{ type:actionTypes.FETCH_ORDERS,
+    token:token,
+    userId:userId
+   }
+    // return dispatch=>{
+    //     dispatch (fetchOrdersStart());   //to show spinner when we load a page
+    //     const queryParams='?auth='+ token+'&orderBy="userId"&equalTo="'+ userId +'"';
+    //     //axios.get('/orders.json?auth='+ token)  //pass ? queryparams and auth= + token for authenticated users to have access to orders.
+    //     axios.get('/orders.json'+ queryParams) 
+    //     .then(res=>{
+    //         const fetchedOrders=[];
+    //        for (let key in res.data){
+    //            fetchedOrders.push({
+    //                ...res.data[key],
+    //                id:key
+    //             });   //converting Orders from object to array
+    //        }
+    //        dispatch(fetchOrdersSuccess(fetchedOrders));
+    //       // this.setState({loading:false, orders:fetchedOrders});
+    //     })
+    //     .catch(err=>{
+    //         dispatch(fetchOrdersFail(err))
+    //        //this.setState({loading:false});
+    //     })
+        
+    // };
+}
+
+
+
